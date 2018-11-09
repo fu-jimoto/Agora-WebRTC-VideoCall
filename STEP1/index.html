@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Agora Web Sample</title>
+<link rel="stylesheet" href="../common/vendor/bootstrap.min.css">
+<script src="../common/AgoraRTCSDK-2.5.0.js"></script>
+<script src="../common/vendor/jquery.js"></script>
+</head>
+<body>
+<div id="log"></div>
+<script language="javascript">
+var app_id = "";
+var client;
+client = AgoraRTC.createClient({mode: 'live', codec:'h264'});
+client.init(app_id, function () {
+  client.join("", "demo", null, function(uid) {
+    $("#log").html("connected");
+  }, function(err) {});
+}, function (err) {});
+</script>
+</body>
+</html>
