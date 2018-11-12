@@ -22,6 +22,17 @@ function leave(){
   }, function (err) {});
 }
 client = AgoraRTC.createClient({mode: 'live', codec:'h264'});
+client.on("active-speaker", function(evt) {
+  var uid = evt.uid;
+  $("#log").html("update active speaker: client " + uid);
+});
+client.on('peer-leave', function (evt) {
+  var stream = evt.stream;
+  if (stream) {
+    stream.stop();
+    $('#agora_remote' + stream.getId()).remove();
+  }
+});
 client.on('stream-added', function (evt) {
   var stream = evt.stream;
   client.subscribe(stream, function (err) {});
