@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Agora Web Sample</title>
+<link rel="stylesheet" href="../common/vendor/bootstrap.min.css">
+<script src="../common/AgoraRTCSDK-2.5.0.js"></script>
+<script src="../common/vendor/jquery.js"></script>
+</head>
+<body>
+<div id="log"></div>
+<button onclick="leave();">leave</button>
+<div id="local_video" style="width:320px;height:240px;"></div>
+<div id="agora_remote" style="width:320px;height:240px;"></div>
+<script language="javascript">
+var app_id = "";
+var client;
+function leave(){
+  client.leave(function () {}, function (err) {});
+}
+client = AgoraRTC.createClient({mode: 'live', codec:'h264'});
+client.on('peer-leave', function (evt) {
+  var stream = evt.stream;
+  if (stream) {
+    stream.stop();
+    $('#agora_remote' + stream.getId()).remove();
+  }
+});
+client.on('stream-added', function (evt) {
+  var stream = evt.stream;
+  client.subscribe(stream, function (err) {});
+});
+client.on('stream-subscribed', function (evt) {
+  var stream = evt.stream;
+  $('div#agora_remote').append('<div id="agora_remote'+stream.getId()+'" style="width:320px;height:240px;"></div>');
+  stream.play('agora_remote' + stream.getId());
+});
+client.init(app_id, function () {
+  client.join("", "demo", null, function(uid) {
+    $("#log").html("connected");
+    localStream = AgoraRTC.createStream({streamID: uid, audio: true, video:true, screen: false});
+    localStream.init(function() {
+      localStream.play("local_video");
+      client.publish(localStream, function (err) {});
+    }, function (err) {});
+  }, function(err) {});
+}, function (err) {});
+</script>
+</body>
+</html>
